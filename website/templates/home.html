@@ -1,0 +1,234 @@
+{% extends "base.html" %} 
+{% block title %}Intro - PEDRO Feed{% endblock %} 
+
+{% block content %}
+<div class="row">
+    <!-- submit-a-case panel -->
+    <div class="col-md-5 mb-4 mx-auto">
+        <div class="p-4 border rounded bg-white shadow-sm text-dark">
+            <h3 class="mb-3 text-center fw-bold">{{ 'Edit Draft' if editing else 'New Case' }}</h3>
+            {% if editing %}<p class="text-center text-muted small">Draft last saved {{ editing.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>{% endif %}
+            
+            {% if user.role != 'admin' %}
+            <form method="POST">
+
+                <!-- INTRO -->
+                <div class="bg-dark text-white fw-bold rounded px-3 py-2 mb-3">Patient Info and Case Details</div>
+
+                <div class="mb-3">
+                    <label for="medical_condition" class="form-label fw-bold">Diagnosis / Disease</label>
+                    <input type="text" name="medical_condition" id="medical_condition" class="form-control" placeholder="e.g., Chronic Lymphocytic Leukemia" required value="{{ f.get('medical_condition', '') }}" />
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="yob" class="form-label fw-bold">Year of Birth</label>
+                        <input type="number" name="yob" id="yob" class="form-control" min="1900" max="{{ current_year }}" required value="{{ f.get('yob', '') }}" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="gender" class="form-label fw-bold">Biological Gender</label>
+                        <select name="gender" id="gender" class="form-select" required>
+                            <option value="" disabled {% if not f.get('gender') %}selected{% endif %}>Select</option>
+                            <option value="M" {% if f.get('gender') == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if f.get('gender') == 'F' %}selected{% endif %}>Female</option>
+                            <option value="NA" {% if f.get('gender') == 'NA' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-8 mb-3">
+                        <label for="current_adverse_event" class="form-label fw-bold">Current Adverse Event Code</label>
+                        <input type="text" name="current_adverse_event" id="current_adverse_event" class="form-control" placeholder="e.g., Neutropenia" required value="{{ f.get('current_adverse_event', '') }}" />
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label for="grade_of_current_adverse_event" class="form-label fw-bold">Grade</label>
+                        <select name="grade_of_current_adverse_event" id="grade_of_current_adverse_event" class="form-select" required>
+                            <option value="" disabled {% if not f.get('grade_of_current_adverse_event') %}selected{% endif %}>Select</option>
+                            <option value="1" {% if f.get('grade_of_current_adverse_event') == '1' %}selected{% endif %}>1</option>
+                            <option value="2" {% if f.get('grade_of_current_adverse_event') == '2' %}selected{% endif %}>2</option>
+                            <option value="3" {% if f.get('grade_of_current_adverse_event') == '3' %}selected{% endif %}>3</option>
+                            <option value="4" {% if f.get('grade_of_current_adverse_event') == '4' %}selected{% endif %}>4</option>
+                            <option value="5" {% if f.get('grade_of_current_adverse_event') == '5' %}selected{% endif %}>5</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="cycle_of_current_adverse_event" class="form-label fw-bold">Treatment Cycle</label>
+                        <input type="number" name="cycle_of_current_adverse_event" id="cycle_of_current_adverse_event" class="form-control" min="1" value="{{ f.get('cycle_of_current_adverse_event', '') }}" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="days_since_current_adverse_event" class="form-label fw-bold">Days since onset</label>
+                        <input type="number" name="days_since_current_adverse_event" id="days_since_current_adverse_event" class="form-control" min="0" value="{{ f.get('days_since_current_adverse_event', '') }}" />
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="previous_adverse_event" id="previous_adverse_event" class="form-check-input" {% if f.get('previous_adverse_event') %}checked{% endif %} />
+                    <label for="previous_adverse_event" class="form-check-label fw-bold">Patient had a previous adverse event</label>
+                </div>
+
+                <div class="mb-4">
+                    <label for="comorbidities" class="form-label fw-bold">Comorbidities</label>
+                    <textarea name="comorbidities" id="comorbidities" class="form-control" rows="2">{{ f.get('comorbidities', '') }}</textarea>
+                </div>
+
+                <!-- CLL TREATMENT HISTORY -->
+                <div class="bg-secondary text-white fw-bold rounded px-3 py-2 mb-3">CLL Treatment History</div>
+
+                <div class="mb-3">
+                    <label for="type_of_current_treatment" class="form-label fw-bold">Treatment Type</label>
+                    <input type="text" name="type_of_current_treatment" id="type_of_current_treatment" class="form-control" placeholder="e.g., Ibrutinib" required value="{{ f.get('type_of_current_treatment', '') }}" />
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="dose_of_current_treatment" class="form-label fw-bold">Dose</label>
+                        <input type="text" name="dose_of_current_treatment" id="dose_of_current_treatment" class="form-control" placeholder="e.g., 420 mg daily" value="{{ f.get('dose_of_current_treatment', '') }}" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="current_line_of_treatment" class="form-label fw-bold">Line of Treatment</label>
+                        <input type="number" name="current_line_of_treatment" id="current_line_of_treatment" class="form-control" min="1" value="{{ f.get('current_line_of_treatment', '') }}" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="date_of_current_treatment" class="form-label fw-bold">Date of Treatment Start</label>
+                    <input type="date" name="date_of_current_treatment" id="date_of_current_treatment" class="form-control" value="{{ f.get('date_of_current_treatment', '') }}" />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="ongoing_treatment" id="ongoing_treatment" class="form-check-input" {% if f.get('ongoing_treatment') %}checked{% endif %} />
+                    <label for="ongoing_treatment" class="form-check-label fw-bold">Treatment is ongoing</label>
+                </div>
+
+                <!-- ayta emfanizontai MONO otan h therapeia diakopike -->
+                <div class="mb-3 d-none" id="interruption-group">
+                    <label for="date_of_treatment_interuption" class="form-label fw-bold text-danger">Date of Treatment Interruption</label>
+                    <input type="date" name="date_of_treatment_interuption" id="date_of_treatment_interuption" class="form-control" value="{{ f.get('date_of_treatment_interuption', '') }}" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="descr_of_current_treatment" class="form-label fw-bold">Description of Treatment</label>
+                    <textarea name="descr_of_current_treatment" id="descr_of_current_treatment" class="form-control" rows="2">{{ f.get('descr_of_current_treatment', '') }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="concomitant_medication" class="form-label fw-bold">Concomitant Medications</label>
+                    <textarea name="concomitant_medication" id="concomitant_medication" class="form-control" rows="2">{{ f.get('concomitant_medication', '') }}</textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="karyotype_treatment" class="form-label fw-bold">Karyotype Treatment Description</label>
+                    <textarea name="karyotype_treatment" id="karyotype_treatment" class="form-control" rows="2">{{ f.get('karyotype_treatment', '') }}</textarea>
+                </div>
+
+                <!-- BEFORE CURRENT TREATMENT -->
+                <div class="bg-info text-white fw-bold rounded px-3 py-2 mb-3">Before Current Treatment</div>
+
+                <div class="row mb-4">
+                    <div class="col-4">
+                        <label for="ighv" class="form-label fw-bold">IGHV gene status</label>
+                        <select name="ighv" id="ighv" class="form-select">
+                            <option value="Unknown" {% if f.get('ighv') == 'Unknown' %}selected{% endif %}>Unknown</option>
+                            <option value="Mutated" {% if f.get('ighv') == 'Mutated' %}selected{% endif %}>Mutated</option>
+                            <option value="Unmutated" {% if f.get('ighv') == 'Unmutated' %}selected{% endif %}>Unmutated</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="del17p" class="form-label fw-bold">del17p</label>
+                        <select name="del17p" id="del17p" class="form-select">
+                            <option value="Unknown" {% if f.get('del17p') == 'Unknown' %}selected{% endif %}>Unknown</option>
+                            <option value="Present" {% if f.get('del17p') == 'Present' %}selected{% endif %}>Present</option>
+                            <option value="Absent" {% if f.get('del17p') == 'Absent' %}selected{% endif %}>Absent</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="tp53" class="form-label fw-bold">TP53 Mutation Status</label>
+                        <select name="tp53" id="tp53" class="form-select">
+                            <option value="Unknown" {% if f.get('tp53') == 'Unknown' %}selected{% endif %}>Unknown</option>
+                            <option value="Mutated" {% if f.get('tp53') == 'Mutated' %}selected{% endif %}>Mutated</option>
+                            <option value="Wild-type" {% if f.get('tp53') == 'Wild-type' %}selected{% endif %}>Wild-type</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ΚΛΙΝΙΚΗ ΠΕΡΙΓΡΑΦΗ -->
+                <div class="bg-light border text-dark fw-bold rounded px-3 py-2 mb-3">Description</div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label fw-bold">Clinical Description</label>
+                    <textarea name="description" id="description" class="form-control" rows="4" placeholder="Medical history, symptoms..." required>{{ f.get('description', '') }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="priority" class="form-label fw-bold">Initial Status</label>
+                    <select name="priority" id="priority" class="form-select" required>
+                        <option value="routine" {% if f.get('priority') == 'routine' %}selected{% endif %}>Routine Case</option>
+                        <option value="urgent" {% if f.get('priority') == 'urgent' %}selected{% endif %}>Urgent Review</option>
+                        <option value="high" {% if f.get('priority') == 'high' %}selected{% endif %}>High Priority</option>
+                    </select>
+                </div>
+
+                <div class="d-flex">
+                    <!-- MAGKIA! "formnovalidate": ena draft mporei na einai incomplete, ARA mporeis na skipareis ta "required" checks tou browser -->
+                    <button type="submit" name="action" value="save_draft" formnovalidate class="btn btn-outline-secondary w-50 mr-2 shadow-sm fw-bold">Save as Draft</button>
+                    <button type="submit" name="action" value="submit" class="btn btn-primary w-50 shadow-sm fw-bold">{{ 'Submit Draft' if editing else 'Upload Case' }}</button>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-info text-center mb-0">You're connected as Admin. Manage case requests from the <strong>Archive</strong> menu.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- APPROVED FEED
+    <div class="col-md-7 mb-4">
+        <h3 class="mb-3 text-dark fw-bold">Approved Scientific Feed</h3>
+        <div id="cases-feed">
+            {% if cases %}
+                {% for case in cases %}
+                    <div class="card mb-3 shadow-sm border-success">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">{{ case.medical_condition }}</h5>
+                            <small>{{ case.date_created.strftime('%d/%m/%Y') }}</small>
+                        </div>
+                        <div class="card-body bg-white text-dark">
+                            <p class="card-text small text-muted mb-1">Year of Birth: {{ case.yob }} | Biological Gender: {{ case.gender }}</p>
+                            <p class="card-text small mb-2">
+                                <span class="fw-bold text-danger">{{ case.current_adverse_event }}</span>
+                                <span class="badge bg-danger">Grade {{ case.grade_of_current_adverse_event }}</span>
+                                <span class="text-muted ms-2">Treatment: <span class="text-primary fw-bold">{{ case.type_of_current_treatment or 'Not specified' }}</span></span>
+                            </p>
+                            <p class="card-text border rounded p-2 bg-light text-truncate" style="max-height: 60px;">{{ case.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">Dr. {{ case.creator.first_name }}</small>
+                                <a href="{{ url_for('views.case_details', case_id=case.id) }}" class="btn btn-sm btn-outline-success">Discussion &amp; Opinions ({{ case.replies|rejectattr('is_internal')|list|length }})</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-light text-center border text-dark p-4 shadow-sm">No published clinical cases in the feed. </div>
+            {% endif %}
+        </div>
+    </div>
+</div> -->
+
+<script>
+    // deicnei to pedio "Date of Treatment Interruption" MONO otan h therapua DEN einai 'ongoing'
+    document.addEventListener('DOMContentLoaded', function () {
+        var ongoing = document.getElementById('ongoing_treatment');
+        var group = document.getElementById('interruption-group');
+        if (!ongoing || !group) return;
+
+        function toggleInterruption() {
+            group.classList.toggle('d-none', ongoing.checked);
+        }
+        ongoing.addEventListener('change', toggleInterruption);
+        toggleInterruption();
+    });
+</script>
+{% endblock %}
