@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="mt-4 mb-4 text-center">Dashboard & Statistics</h1>
+
+<div class="row text-center mb-5">
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-2">
+        <a href="{{ url_for('views.archive') }}?tab=drafts" class="text-decoration-none transition-hover d-block">
+            <div class="p-3 bg-white border-start border-warning border-4 rounded shadow-sm card-metric">
+                <h6 class="text-muted text-uppercase small fw-bold">REVIEWED DRAFTS</h6>
+                <h3 class="fw-bold mb-0 text-dark">{{ triage }}</h3>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Κουτί 2: Accepted archive?tab=resolved-->
+    <div class="col-md-4 mb-2">
+        <a href="{{ url_for('views.archive') }}?tab=board" class="text-decoration-none d-block">
+            <div class="p-3 bg-white border-start border-primary border-4 rounded shadow-sm">
+                <h6 class="text-muted text-uppercase small fw-bold">Closed Cases</h6>
+                <h3 class="fw-bold mb-0 text-dark">{{ board }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <!-- Κουτί 3: Rejected archive?tab=resolved-->
+    <div class="col-md-4 mb-2">
+        <a href="{{ url_for('views.archive') }}?tab=resolved" class="text-decoration-none d-block">
+            <div class="p-3 bg-white border-start border-success border-4 rounded shadow-sm">
+                <h6 class="text-muted text-uppercase small fw-bold">Rejected Cases</h6>
+                <h3 class="fw-bold mb-0 text-dark">{{ resolved }}</h3>
+            </div>
+        </a>
+    </div>
+
+
+</div>
+
+<style>
+    .card-metric { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-metric:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,0.15)!important; }
+</style>
+
+</div>
+
+<!-- ΛΙΣΤΑ ΤΩΝ ΔΙΚΩΝ ΜΟΥ ΠΕΡΙΣΤΑΤΙΚΩΝ ΜΕ ΕΠΙΛΟΓΗ ΔΙΑΓΡΑΦΗΣ -->
+<h3>History/Archive</h3>
+<div class="list-group shadow-sm mt-3 mb-5">
+    {% set my_cases = user.created_cases %}
+    {% if my_cases %}
+        {% for c in my_cases if not c.is_deleted %}
+            <div class="list-group-item d-flex justify-content-between align-items-center bg-white text-dark">
+                <div>
+                    <h5 class="mb-1 fw-bold">{{ c.medical_condition }}</h5>
+                    <small class="text-muted">Satus: 
+                        <span class="badge {% if c.priority == 'approved' %}bg-success{% elif c.priority == 'resolved' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                            {{ c.priority|upper }}
+                        </span>
+                    </small>
+                </div>
+                <div>
+                    <a href="{{ url_for('views.case_details', case_id=c.id) }}" class="btn btn-outline-primary btn-sm me-2">Review</a>
+                    <a href="{{ url_for('views.delete_case', case_id=c.id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Θέλετε να διαγράψετε το περιστατικό από τη ροή;');">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted p-3">You have not submitted any clinical cases yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
